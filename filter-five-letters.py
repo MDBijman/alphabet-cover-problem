@@ -19,9 +19,15 @@ for line in word_file:
         continue
 
     if len(word) == 5:
-        out.append(word)
+        out.append(("".join(sorted(word)), word))
 
-out.sort()
-for word in out:
+def first(pair):
+    return pair[0]
+
+out.sort(key=first)
+for word_sorted, word in out:
+    filtered_file.write(word_sorted)
+    filtered_file.write(" ")
     filtered_file.write(word)
     filtered_file.write("\n")
+

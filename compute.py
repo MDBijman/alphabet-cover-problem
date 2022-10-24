@@ -13,8 +13,6 @@ in_file = open(in_path, "r")
 def letters_available(letters, word):
     return letters & word == word
 
-# optimize?
-#return 1<<(ord(ch) - ord('a'))
 def letter_to_number(ch):
     return 2**(ord(ch) - ord('a'))
 
@@ -37,25 +35,30 @@ def number_to_letters(n):
 
 alphabet = word_to_number("abcdefghijklmnopqrstuvwxyz")
 
-# dict of letter to first index of word beginning with that letter
-chapters = {}
+# dict of letter to first index of word beginning with next letter
+next_chapter = {}
 words = []
+original_words = []
 first_letters = []
 first_letters_num = []
 
+prev_chapter = None
 cur_chapter = None
-for i, line in enumerate(in_file.readlines()[9600:]):
-#for i, line in enumerate(in_file.readlines()):
-    words.append(line[:-1])
-    first_letters.append(line[0])
-    first_letters_num.append(letter_to_number(line[0]))
+for i, line in enumerate(in_file.readlines()[9300:]):
+    elems = line.split(" ")
+    words.append(elems[0])
+    original_words.append(elems[1][:-1])
 
-    if cur_chapter is None or ord(line[0]) > ord(cur_chapter):
-        cur_chapter = line[0]
-        chapters[letter_to_number(cur_chapter)] = i
-        #print(cur_chapter, i )
+    first_letters.append(elems[0][0])
+    first_letters_num.append(letter_to_number(elems[0][0]))
+
+    if cur_chapter is None:
+        cur_chapter = first_letters[-1]
+    elif ord(first_letters[-1]) > ord(cur_chapter):
+        prev_chapter = cur_chapter
+        cur_chapter = first_letters[-1]
+        next_chapter[letter_to_number(prev_chapter)] = i
     
-print(len(words))
 bin_words = [word_to_number(w) for w in words]
 
 do_trace = False
@@ -113,8 +116,15 @@ def solve():
         else:
             # check first letter first - if fail we skip to next chapter
             first_letter_num = first_letters_num[i]
-            if not letters_available(cur_alphabet, first_letter_num) and first_letter_num != 33554432:
-                i = chapters[first_letters_num[i] << 1]
+            if not letters_available(cur_alphabet, first_letter_num):
+                # end of book
+                if first_letters_num[i] not in next_chapter:
+                    t = stack[-1]
+                    stack.pop()
+                    i = t[1]
+                    cur_alphabet = (cur_alphabet + t[0])
+                else:
+                    i = next_chapter[first_letters_num[i]]
             # if letters unavailable increment by one
             else:
                 i += 1
