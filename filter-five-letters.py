@@ -25,9 +25,25 @@ def first(pair):
     return pair[0]
 
 out.sort(key=first)
-for word_sorted, word in out:
+
+
+dedup = []
+prev_word = None
+cur_wordset = []
+for i, (s, w) in enumerate(out):
+    if prev_word is None:
+        prev_word = s
+        cur_wordset.append(w)
+    elif s != prev_word:
+        dedup.append((prev_word, cur_wordset))
+        prev_word = s
+        cur_wordset = [w]
+    else:
+        cur_wordset.append(w)
+
+for word_sorted, wordset in dedup:
     filtered_file.write(word_sorted)
     filtered_file.write(" ")
-    filtered_file.write(word)
+    filtered_file.write(str(wordset))
     filtered_file.write("\n")
 

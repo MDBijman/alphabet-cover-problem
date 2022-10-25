@@ -1,3 +1,4 @@
+import ast
 import cProfile
 import sys
 import time
@@ -38,19 +39,20 @@ alphabet = word_to_number("abcdefghijklmnopqrstuvwxyz")
 # dict of letter to first index of word beginning with next letter
 next_chapter = {}
 words = []
-original_words = []
+wordsets = []
 first_letters = []
 first_letters_num = []
 
 prev_chapter = None
 cur_chapter = None
-for i, line in enumerate(in_file.readlines()[9300:]):
-    elems = line.split(" ")
-    words.append(elems[0])
-    original_words.append(elems[1][:-1])
+for i, line in enumerate(in_file.readlines()[5000:]):
+    word = line.split(" ")[0]
+    words.append(word)
+    wordset = line[len(word) + 1:]
+    wordsets.append(ast.literal_eval(wordset))
 
-    first_letters.append(elems[0][0])
-    first_letters_num.append(letter_to_number(elems[0][0]))
+    first_letters.append(word[0])
+    first_letters_num.append(letter_to_number(word[0]))
 
     if cur_chapter is None:
         cur_chapter = first_letters[-1]
@@ -59,6 +61,7 @@ for i, line in enumerate(in_file.readlines()[9300:]):
         cur_chapter = first_letters[-1]
         next_chapter[letter_to_number(prev_chapter)] = i
     
+print(len(words))
 bin_words = [word_to_number(w) for w in words]
 
 do_trace = False
