@@ -4,6 +4,7 @@ in_path = sys.argv[1]
 word_file = open(in_path, "r")
 out_path = sys.argv[2]
 filtered_file = open(out_path, "w")
+tmp_file = open("tmp.txt", "w")
 
 def is_candidate(word):
     letters = set([x for x in word])
@@ -20,6 +21,8 @@ for line in word_file:
 
     if len(word) == 5:
         out.append(("".join(sorted(word)), word))
+        tmp_file.write(word)
+        tmp_file.write("\n")
 
 def first(pair):
     return pair[0]
